@@ -8,24 +8,29 @@ const {
   deleteContact,
   updateContact,
   updateStatusContact,
-} = require("../../controllers/contacts");
+} = require("../../controllers/contacts/contactsControllers");
 const { ctrlWrapper } = require("../../middlewares/catchAsyncWrapper");
 const { validation } = require("../../middlewares/validation");
 const { contactJoiSchema, favJoiSchema } = require("../../schemas/contacts");
+const { authenticate } = require("../../middlewares/authenticate");
 
 router
   .route("/")
-  .get(ctrlWrapper(getAll))
-  .post(validation(contactJoiSchema), ctrlWrapper(addContact));
+  .get(authenticate, ctrlWrapper(getAll))
+  .post(authenticate, validation(contactJoiSchema), ctrlWrapper(addContact));
 
 router
   .route("/:contactId")
-  .get(ctrlWrapper(getContactById))
-  .delete(ctrlWrapper(deleteContact))
-  .put(validation(contactJoiSchema), ctrlWrapper(updateContact));
+  .get(authenticate, ctrlWrapper(getContactById))
+  .delete(authenticate, ctrlWrapper(deleteContact))
+  .put(authenticate, validation(contactJoiSchema), ctrlWrapper(updateContact));
 
 router
   .route("/:contactId/favorite")
-  .patch(validation(favJoiSchema), ctrlWrapper(updateStatusContact));
+  .patch(
+    authenticate,
+    validation(favJoiSchema),
+    ctrlWrapper(updateStatusContact)
+  );
 
 module.exports = router;
