@@ -1,7 +1,11 @@
 const express = require("express");
 const { validation } = require("../../middlewares/validation");
 const { authenticate } = require("../../middlewares/authenticate");
-const { registerSchema, loginSchema } = require("../../schemas/users");
+const {
+  registerSchema,
+  loginSchema,
+  userVerifyJoiSchema,
+} = require("../../schemas/users");
 const { ctrlWrapper } = require("../../middlewares/catchAsyncWrapper");
 const {
   register,
@@ -10,6 +14,8 @@ const {
   logout,
   updateUserSubscription,
   updateAvatar,
+  getVerifyUserEmail,
+  resendVerifyUserEmail,
 } = require("../../controllers/auth/userControllers");
 const { upload } = require("../../middlewares");
 
@@ -30,6 +36,14 @@ router.patch(
   authenticate,
   upload.single("avatar"),
   ctrlWrapper(updateAvatar)
+);
+
+router.get("/verify/:verificationToken", ctrlWrapper(getVerifyUserEmail));
+
+router.post(
+  "/verify",
+  validation(userVerifyJoiSchema),
+  ctrlWrapper(resendVerifyUserEmail)
 );
 
 module.exports = router;
